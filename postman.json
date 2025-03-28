@@ -1,0 +1,426 @@
+{
+    "info": {
+      "name": "Event Booking Microservices",
+      "_postman_id": "00000000-0000-0000-0000-000000000000",
+      "description": "A collection of requests to test the User, Event, Booking, and Notification services in the Online Event Booking platform.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "User Service",
+        "item": [
+          {
+            "name": "Register User",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"username\": \"majjed\",\n    \"123\": \"secret\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:3001/users/register",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "3001",
+                "path": [
+                  "users",
+                  "register"
+                ]
+              },
+              "description": "Register a new user in the User Service."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 201 or 200\", function () {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Login User",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"username\": \"alice\",\n    \"password\": \"secret\"\n}"
+              },
+              "url": {
+                "raw": "http://localhost:3001/users/login",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "3001",
+                "path": [
+                  "users",
+                  "login"
+                ]
+              },
+              "description": "Login with the previously registered user."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Event Service",
+        "item": [
+          {
+            "name": "Create Event",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Music Concert\",\n  \"date\": \"2025-05-01T19:00:00.000Z\",\n  \"location\": \"City Hall\",\n  \"totalSeats\": 200\n}"
+              },
+              "url": {
+                "raw": "http://localhost:4000/events",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "4000",
+                "path": [
+                  "events"
+                ]
+              },
+              "description": "Create a new Event in the Event Service."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 201\", function () {",
+                    "    pm.response.to.have.status(201);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Get All Events",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:4000/events",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "4000",
+                "path": [
+                  "events"
+                ]
+              },
+              "description": "Retrieve all events."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Get Single Event (Replace eventId)",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:4000/events/<eventId>",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "4000",
+                "path": [
+                  "events",
+                  "<eventId>"
+                ]
+              },
+              "description": "Get a single event by ID. Replace <eventId> with the actual _id from the Create Event response."
+            },
+            "response": []
+          },
+          {
+            "name": "Check Availability (Replace eventId)",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:4000/events/<eventId>/availability",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "4000",
+                "path": [
+                  "events",
+                  "<eventId>",
+                  "availability"
+                ]
+              },
+              "description": "Check availability of a single event. Replace <eventId> with the actual _id from the Create Event response."
+            },
+            "response": []
+          }
+        ]
+      },
+      {
+        "name": "Booking Service",
+        "item": [
+          {
+            "name": "Create Booking",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"userId\": 1,\n  \"eventId\": \"645ffa3d7c8b2f3b442c7d7e\",\n  \"seatsBooked\": 2\n}"
+              },
+              "url": {
+                "raw": "http://localhost:5000/bookings",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "5000",
+                "path": [
+                  "bookings"
+                ]
+              },
+              "description": "Creates a new booking. Replace \"eventId\" if needed with your actual event's _id from the Event Service."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 201\", function () {",
+                    "    pm.response.to.have.status(201);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Get All Bookings",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:5000/bookings",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "5000",
+                "path": [
+                  "bookings"
+                ]
+              },
+              "description": "Retrieve all bookings."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Get Single Booking (Replace bookingId)",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:5000/bookings/<bookingId>",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "5000",
+                "path": [
+                  "bookings",
+                  "<bookingId>"
+                ]
+              },
+              "description": "Retrieve a single booking by ID."
+            },
+            "response": []
+          },
+          {
+            "name": "Mock Payment (Directly)",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"userId\": 1,\n  \"amount\": 100\n}"
+              },
+              "url": {
+                "raw": "http://localhost:5000/payments",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "5000",
+                "path": [
+                  "payments"
+                ]
+              },
+              "description": "Calls the mock payment endpoint in the Booking Service."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Notification Service",
+        "item": [
+          {
+            "name": "Health Check",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:6060/",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "6000",
+                "path": [
+                  ""
+                ]
+              },
+              "description": "Checks that the Notification Service is running."
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Get All Notifications (Optional)",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "http://localhost:6060/notifications",
+                "protocol": "http",
+                "host": [
+                  "localhost"
+                ],
+                "port": "6000",
+                "path": [
+                  "notifications"
+                ]
+              },
+              "description": "If your Notification Service exposes a GET /notifications endpoint to retrieve logs."
+            },
+            "response": []
+          }
+        ]
+      }
+    ]
+  }
+  
