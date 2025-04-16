@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=user_db
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    depends_on:
+      - postgres
+    environment:
+      - USER_DB_HOST=postgres
+      - USER_DB_USER=postgres
+      - USER_DB_PASS=postgres
+      - USER_DB_NAME=user_db
+      - PORT=3001
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+
+  event-service:
+    build: ./event-service
+    container_name: event-service
+    depends_on:
+      - mongodb
+    environment:
+      - EVENT_DB_URI=mongodb://mongodb:27017/eventdb
+      - PORT=4000
+    ports:
+      - "4000:4000"
+    networks:
+      - app-network
+
+  booking-service:
+    build: ./booking-service
+    container_name: booking-service
+    depends_on:
+      - postgres
+      - event-service
+    environment:
+      - BOOKING_DB_HOST=postgres
+      - BOOKING_DB_USER=postgres
+      - BOOKING_DB_PASS=postgres
+      - BOOKING_DB_NAME=booking_db
+      - EVENT_SERVICE_URL=http://event-service:4000
+      - PORT=5000
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    depends_on:
+      - mongodb
+    environment:
+      - NOTIFICATION_DB_URI=mongodb://mongodb:27017/notificationsdb
+      - PORT=6060
+    ports:
+      - "6060:6060"
+    networks:
+      - app-network
+
+  frontend-service:
+    build: ./frontend-service
+    container_name: frontend-service
+    ports:
+      - "3000:80"
+    depends_on:
+      - user-service
+      - event-service
+      - booking-service
+      - notification-service
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:
+  pg-data:
+
+networks:
+  app-network:
+    driver: bridge

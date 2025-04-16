@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service-depl
+  namespace: onlineeventbooking-yourname
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+  template:
+    metadata:
+      labels:
+        app: booking-service
+    spec:
+      containers:
+      - name: booking-service-container
+        image: your-dockerhub-username/booking-service:latest
+        ports:
+          - containerPort: 5000
+        env:
+          - name: BOOKING_DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: eventbooking-config
+                key: BOOKING_DB_HOST
+          - name: BOOKING_DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: eventbooking-config
+                key: BOOKING_DB_NAME
+          - name: BOOKING_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: eventbooking-secrets
+                key: POSTGRES_USER
+          - name: BOOKING_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: eventbooking-secrets
+                key: POSTGRES_PASSWORD
+          - name: EVENT_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: eventbooking-config
+                key: EVENT_SERVICE_URL
+          - name: PORT
+            value: "5000"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service-svc
+  namespace: onlineeventbooking-yourname
+spec:
+  selector:
+    app: booking-service
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP

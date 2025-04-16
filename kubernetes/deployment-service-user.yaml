@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-depl
+  namespace: onlineeventbooking-yourname
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service-container
+        image: your-dockerhub-username/user-service:latest
+        ports:
+          - containerPort: 3001
+        env:
+          - name: USER_DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: eventbooking-config
+                key: USER_DB_HOST
+          - name: USER_DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: eventbooking-config
+                key: USER_DB_NAME
+          - name: USER_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: eventbooking-secrets
+                key: POSTGRES_USER
+          - name: USER_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: eventbooking-secrets
+                key: POSTGRES_PASSWORD
+          - name: PORT
+            value: "3001"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service-svc
+  namespace: onlineeventbooking-yourname
+spec:
+  selector:
+    app: user-service
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: ClusterIP

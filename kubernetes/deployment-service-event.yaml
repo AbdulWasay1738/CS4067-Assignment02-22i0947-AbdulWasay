@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-service-depl
+  namespace: onlineeventbooking-yourname
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-service
+  template:
+    metadata:
+      labels:
+        app: event-service
+    spec:
+      containers:
+      - name: event-service-container
+        image: your-dockerhub-username/event-service:latest
+        ports:
+          - containerPort: 4000
+        env:
+          - name: EVENT_DB_URI
+            valueFrom:
+              configMapKeyRef:
+                name: eventbooking-config
+                key: EVENT_DB_URI
+          - name: PORT
+            value: "4000"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-service-svc
+  namespace: onlineeventbooking-yourname
+spec:
+  selector:
+    app: event-service
+  ports:
+    - protocol: TCP
+      port: 4000
+      targetPort: 4000
+  type: ClusterIP

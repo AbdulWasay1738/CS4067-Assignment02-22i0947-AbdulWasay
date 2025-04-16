@@ -1,0 +1,10 @@
+# notification-service-codebase/Dockerfile
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+# Suppose this service runs on 6060
+EXPOSE 6060
+CMD ["npm", "start"]
